@@ -16,20 +16,26 @@ import { Redirect } from '@nestjs/common/decorators/http/redirect.decorator';
 import { Request, Response } from 'express';
 import { version } from 'os';
 import { Observable, of, retry } from 'rxjs';
-import { CreateCatDto, ListAllEntities, UpdateCatDto } from './create-cat.dto';
+import { CatsService } from './cats.service';
+import {
+  CreateCatDto,
+  ListAllEntities,
+  UpdateCatDto,
+} from './dto/create-cat.dto';
+import { Cat } from './interface/cat.interface';
 
 @Controller('cats')
 export class CatsController {
+  constructor(private catsService: CatsService) {}
+
   @Post()
-  create(@Res() res: Response) {
-    res.status(HttpStatus.CREATED).send();
+  async create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
   }
 
   @Get()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  findAll(@Res({ passthrough: true }) res: Response) {
-    res.status(HttpStatus.OK);
-    return [];
+  async findAll(): Promise<Cat[]> {
+    return this.catsService.findAll();
   }
 
   @Get(':id')
